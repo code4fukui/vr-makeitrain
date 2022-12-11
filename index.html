@@ -9,6 +9,7 @@ import { XRButton } from "./XRButton.js";
 import { OBJ } from "./OBJ.js";
 
 const N_OBJECTS = 400;
+const SIM_SPEED = 0.05; // slow down simulation (real speed = 1.0)
 
 const clock = new THREE.Clock();
 
@@ -26,6 +27,7 @@ const content = [
   `<a href=https://github.com/code4fukui/vr-makeitrain>make it rain AR - src on GitHub</a>`,
   `forked: <a href=https://vr-makeitrain.glitch.me/>vr - make it rain</a>`,
   `Lib: <a href="https://threejs.org">Three.js</a>`,
+  `Card: <a href="https://www.irasutoya.com/2017/05/cardback.html">いらすとや</a>`,
   `<a href="https://poly.google.com/view/btWmPNVSKUc">hand</a> by poly`,
 ];
 info.innerHTML = content.join("<br>");
@@ -57,11 +59,11 @@ const room = (() => {
 //const texture = new THREE.TextureLoader().load("./money_10000.png"); // 478x211
 //const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 478 * 211);
 
-//const texture = new THREE.TextureLoader().load("./card_back.png"); // 400x273
-//const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 400 * 273);
+const texture = new THREE.TextureLoader().load("./card_back.png"); // 400x273
+const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 400 * 273);
 
-const texture = new THREE.TextureLoader().load("./card_whowatch.jpg"); // 512x362
-const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 512 * 362);
+//const texture = new THREE.TextureLoader().load("./card_whowatch.jpg"); // 512x362
+//const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 512 * 362);
 
 geometry.rotateZ(Math.PI / 2);
 geometry.rotateX(-Math.PI / 2); 
@@ -190,7 +192,7 @@ renderer.setAnimationLoop(() => {
   handleController(controller1);
   //handleController(controller2);
   //
-  const delta = clock.getDelta() * 0.05; // slow down simulation
+  const delta = clock.getDelta() * SIM_SPEED;
 
   for (let i = 0; i < room.children.length; i++) {
     const object = room.children[i];
