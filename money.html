@@ -56,17 +56,17 @@ const room = (() => {
 //const texture = new THREE.TextureLoader().load("https://cdn.glitch.com/cf086db5-7af7-4f20-8220-93d1d99150b7%2F100_dollar_bill_vector.png?1558543607686");
 //const geometry = new THREE.PlaneBufferGeometry(0.2, 0.09);
 
-//const texture = new THREE.TextureLoader().load("./money_10000.png"); // 478x211
-//const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 478 * 211);
+const texture = new THREE.TextureLoader().load("./money_10000.png"); // 478x211
+const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 478 * 211);
 
-const texture = new THREE.TextureLoader().load("./card_back.png"); // 400x273
-const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 400 * 273);
+//const texture = new THREE.TextureLoader().load("./card_back.png"); // 400x273
+//const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 400 * 273);
 
 //const texture = new THREE.TextureLoader().load("./card_whowatch.jpg"); // 512x362
 //const geometry = new THREE.PlaneBufferGeometry(0.2, 0.2 / 512 * 362);
 
 geometry.rotateZ(Math.PI / 2);
-geometry.rotateX(-Math.PI / 2); 
+geometry.rotateX(-Math.PI / 2);
 texture.anisotropy = 8;
 
 const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
