@@ -6,72 +6,34 @@
 
 // base code https://unpkg.com/three@0.111.0/examples/jsm/webxr/VRButton.js
 
-var XRButton = {
+class XRButton {
 
-	createButton: function ( renderer, options ) {
+	static createButton(renderer) {
+		let button;
 
-		if ( options && options.referenceSpaceType ) {
+		function showEnterXR() {
 
-			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
-
-		}
-
-		function showEnterVR( device ) {
-
-			button.style.display = '';
-
-			button.style.cursor = 'pointer';
-			button.style.left = 'calc(50% - 50px)';
-			button.style.width = '100px';
-
-			button.textContent = 'ENTER_XR';
-
-			button.onmouseenter = function () {
-
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
-
-			};
-
-			button.onclick = function () {
-
-				device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
-
-			};
-
-			renderer.vr.setDevice( device );
-
-		}
-
-		function showEnterXR( /*device*/ ) {
-
-			var currentSession = null;
+			let currentSession = null;
 
 			async function onSessionStarted(session) {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				renderer.vr.setSession( session );
-				button.textContent = 'EXIT XR';
-        session.isImmersive = true;
-        
         // https://developer.mozilla.org/ja/docs/Web/API/XRSession/requestReferenceSpace
-        await session.requestReferenceSpace("local");
+        //await session.requestReferenceSpace("local");
+				//renderer.xr.setReferenceSpaceType("local"); // for immersive-ar?
 
+				await renderer.xr.setSession(session);
+				button.textContent = 'EXIT XR';
+        //session.isImmersive = true;
+        
 				currentSession = session;
-
 			}
 
 			function onSessionEnded( /*event*/ ) {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				renderer.vr.setSession( null );
 				button.textContent = 'ENTER XR';
 
 				currentSession = null;
@@ -111,7 +73,8 @@ var XRButton = {
 					// ('local' is always available for immersive sessions and doesn't need to
 					// be requested separately.)
 
-					var sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
+					const sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
+					//const sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking', 'layers' ] };
 					//navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
 					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( onSessionStarted );
 				} else {
@@ -136,16 +99,6 @@ var XRButton = {
 			button.onmouseleave = null;
 
 			button.onclick = null;
-
-		}
-
-		function showVRNotFound() {
-
-			disableButton();
-
-			button.textContent = 'XR NOT FOUND';
-
-			renderer.vr.setDevice( null );
 
 		}
 
@@ -176,7 +129,7 @@ var XRButton = {
 
 		if ( 'xr' in navigator ) {
 
-			var button = document.createElement( 'button' );
+			button = document.createElement( 'button' );
 			button.style.display = 'none';
 
 			stylizeElement( button );
@@ -187,6 +140,12 @@ var XRButton = {
 
 					showEnterXR();
 
+					/*
+					if (XRButton.xrSessionIsGranted) {
+						button.click();
+					}
+					*/
+
 				} else {
 
 					showXRNotFound();
@@ -194,60 +153,10 @@ var XRButton = {
 				}
 
 			} );
-
 			return button;
-
-		} else if ( 'getVRDisplays' in navigator ) {
-
-			var button = document.createElement( 'button' );
-			button.style.display = 'none';
-
-			stylizeElement( button );
-
-			window.addEventListener( 'vrdisplayconnect', function ( event ) {
-
-				showEnterVR( event.display );
-
-			}, false );
-
-			window.addEventListener( 'vrdisplaydisconnect', function ( /*event*/ ) {
-
-				showVRNotFound();
-
-			}, false );
-
-			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
-
-				button.textContent = event.display.isPresenting ? 'EXIT_XR' : 'ENTER_XR';
-
-			}, false );
-
-			window.addEventListener( 'vrdisplayactivate', function ( event ) {
-
-				event.display.requestPresent( [ { source: renderer.domElement } ] );
-
-			}, false );
-
-			navigator.getVRDisplays()
-				.then( function ( displays ) {
-
-					if ( displays.length > 0 ) {
-
-						showEnterVR( displays[ 0 ] );
-
-					} else {
-
-						showVRNotFound();
-
-					}
-
-				} ).catch( showVRNotFound );
-
-			return button;
-
 		} else {
 
-			var message = document.createElement( 'a' );
+			const message = document.createElement( 'a' );
 			message.href = 'https://immersive-web.github.io/webxr/';
 			message.innerHTML = 'WEBXR NOT SUPPORTED';
 
@@ -262,7 +171,29 @@ var XRButton = {
 		}
 
 	}
+	/*
+	static xrSessionIsGranted = false;
 
+	static registerSessionGrantedListener() {
+
+		if ( 'xr' in navigator ) {
+
+			// WebXRViewer (based on Firefox) has a bug where addEventListener
+			// throws a silent exception and aborts execution entirely.
+			if ( /WebXRViewer\//i.test( navigator.userAgent ) ) return;
+
+			navigator.xr.addEventListener( 'sessiongranted', () => {
+
+				XRButton.xrSessionIsGranted = true;
+
+			} );
+
+		}
+
+	}
+	*/
 };
+
+//XRButton.registerSessionGrantedListener();
 
 export { XRButton };
